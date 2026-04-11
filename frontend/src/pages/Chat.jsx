@@ -68,7 +68,7 @@ export default function Chat() {
 
     setInput("");
   };
-
+// likitsorma
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
