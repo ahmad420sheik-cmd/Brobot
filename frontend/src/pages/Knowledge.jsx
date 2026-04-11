@@ -1,29 +1,44 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 export default function Knowledge() {
   const [pages, setPages] = useState(["Page 1"]);
   const [activePage, setActivePage] = useState("Page 1");
   const [content, setContent] = useState("");
 
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef();
+
+  // close dropdown when clicking outside
+  useEffect(() => {
+    const handleClick = (e) => {
+      if (!dropdownRef.current?.contains(e.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
   const addPage = () => {
     const newPage = `Page ${pages.length + 1}`;
     setPages([...pages, newPage]);
     setActivePage(newPage);
+    setDropdownOpen(false);
   };
 
   return (
     <div className="flex gap-6 p-6">
 
-      {/* LEFT SIDEBAR */}
+      {/* 🔹 LEFT SIDEBAR */}
       <div className="w-[250px]">
 
         {/* SEARCH */}
         <input
-          placeholder="Buscar..."
+          placeholder="Search..."
           className="w-full px-3 py-2 border rounded-lg mb-4 text-sm"
         />
 
-        {/* PAGES LIST */}
+        {/* PAGES */}
         <div className="space-y-2">
           {pages.map((page, i) => (
             <div
@@ -42,11 +57,12 @@ export default function Knowledge() {
 
       </div>
 
-      {/* RIGHT PANEL */}
+      {/* 🔹 RIGHT PANEL */}
       <div className="flex-1 bg-white rounded-2xl shadow border">
 
         {/* HEADER */}
         <div className="flex justify-between items-center px-6 py-4 border-b">
+
           <div>
             <h2 className="font-semibold text-lg flex items-center gap-2">
               📚 Knowledge
@@ -56,17 +72,56 @@ export default function Knowledge() {
             </p>
           </div>
 
-          <button
-            onClick={addPage}
-            className="bg-black text-white px-4 py-2 rounded-lg text-sm"
-          >
-            + Add
-          </button>
+          {/* 🔥 ADD DROPDOWN */}
+          <div className="relative" ref={dropdownRef}>
+
+            <button
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              className="bg-black text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2"
+            >
+              + Add
+              <span>▾</span>
+            </button>
+
+            {dropdownOpen && (
+              <div className="absolute right-0 mt-2 w-44 bg-white border rounded-xl shadow-lg overflow-hidden z-50">
+
+                <button
+                  onClick={() => {
+                    setDropdownOpen(false);
+                    console.log("Upload File");
+                  }}
+                  className="w-full text-left px-4 py-3 hover:bg-gray-100 flex items-center gap-2 text-sm"
+                >
+                  📎 File
+                </button>
+
+                <button
+                  onClick={addPage}
+                  className="w-full text-left px-4 py-3 hover:bg-gray-100 flex items-center gap-2 text-sm"
+                >
+                  📄 Page
+                </button>
+
+                <button
+                  onClick={() => {
+                    setDropdownOpen(false);
+                    console.log("Add Website");
+                  }}
+                  className="w-full text-left px-4 py-3 hover:bg-gray-100 flex items-center gap-2 text-sm"
+                >
+                  🌐 Website
+                </button>
+
+              </div>
+            )}
+
+          </div>
         </div>
 
-        {/* PAGE TITLE */}
+        {/* TITLE */}
         <div className="px-6 pt-4">
-          <label className="text-sm text-gray-500">Qualification</label>
+          <label className="text-sm text-gray-500">Title</label>
 
           <input
             value={activePage}
@@ -88,15 +143,15 @@ export default function Knowledge() {
 
           <div className="w-px h-4 bg-gray-300"></div>
 
-          <button className="text-xs">Remove formatting</button>
+          <button className="text-xs">Clear format</button>
         </div>
 
-        {/* TEXT AREA */}
+        {/* CONTENT */}
         <div className="p-6">
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            placeholder="Añade aquí instrucciones, reglas, ejemplos o contexto para la IA..."
+            placeholder="Add instructions, rules, examples or context for the AI here..."
             className="w-full h-[300px] resize-none outline-none text-sm"
           />
         </div>
@@ -104,7 +159,7 @@ export default function Knowledge() {
         {/* FOOTER */}
         <div className="px-6 py-3 border-t text-xs text-gray-400 flex justify-between">
           <span>Characters: {content.length}</span>
-          <span>Total: 0 / 10,000 · Fountain: Text</span>
+          <span>Total: 0 / 10,000 · Source: Text</span>
         </div>
 
       </div>
